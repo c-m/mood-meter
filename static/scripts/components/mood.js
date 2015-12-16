@@ -38,14 +38,14 @@ let Mood = React.createClass({
     return <div className="mood moodmeter-content">
       <button className={buttonClassesLeft}
             disabled={isLoadingLeft || isMoodSetLeft || isLoadingRight || isMoodSetRight}
-            onClick={!isLoadingLeft ? this.setStatusLeft("stressed") : null}>
+            onClick={!isLoadingLeft ? this.setStatusLeft : null}>
         {isLoadingLeft ? <Icon spin name="circle-o-notch" />
                    : isMoodSetLeft ? <Icon name="check-circle" />
                                : <Icon name="meh-o" />}
       </button>
       <button className={buttonClassesRight}
              disabled={isLoadingRight || isMoodSetRight || isLoadingLeft || isMoodSetLeft}
-             onClick={!isLoadingRight ? this.setStatusRight("happy") : null}>
+             onClick={!isLoadingRight ? this.setStatusRight : null}>
         {isLoadingRight ? <Icon spin name="circle-o-notch" />
                    : isMoodSetRight ? <Icon name="check-circle" />
                                : <Icon name="smile-o" />}
@@ -53,14 +53,13 @@ let Mood = React.createClass({
     </div>
   },
 
-  setStatus(msg) {
+  setStatusLeft() {
     // Replace button state
     this.setState({
-        isLoadingLeft: true,
-        isLoadingRight: true
+        isLoadingLeft: true
     });
 
-    let moodMessage = { message: msg };
+    let moodMessage = { message: "stressed" };
 
     fetch(window.STATUSES, {
       method: "POST",
@@ -74,14 +73,38 @@ let Mood = React.createClass({
         // Completed of async action, set loading state back
         this.setState({
           isLoadingLeft: false,
-          isLoadingRight: false,
-          isMoodSetLeft: true,
-          isMoodSetRight: true,
+          isMoodSetLeft: true
         });
       }, 2000);
     });
-  }
-  
+},
+
+setStatusRight() {
+  // Replace button state
+  this.setState({
+      isLoadingRight: true
+  });
+
+  let moodMessage = { message: "happy" };
+
+  fetch(window.STATUSES, {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(moodMessage)
+  }).then((res) => {
+    setTimeout(() => {
+
+      // Completed of async action, set loading state back
+      this.setState({
+        isLoadingRight: false,
+        isMoodSetRight: true
+      });
+    }, 2000);
+  });
+}
+
 });
 
 export default Mood;
