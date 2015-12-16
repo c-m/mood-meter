@@ -21,7 +21,7 @@ let StressedApp = React.createClass({
   displayName: "StressedApp",
 
   render() {
-    return <div className="streesed-app">
+    return <div className="stressed-app">
       <div className="stressed-wrapper">
         <RouteHandler />
         <Navigation />

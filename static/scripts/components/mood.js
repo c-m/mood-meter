@@ -10,78 +10,57 @@ let Mood = React.createClass({
 
   getInitialState() {
     return {
-      isLoading_l: false,
-      isMoodSet_r: false,
-      isLoading_r: false,
-      isMoodSet_r: false
+      isLoadingLeft: false,
+      isMoodSetLeft: false,
+      isLoadingRight: false,
+      isMoodSetRight: false
     };
   },
 
   render() {
-    let isLoading_l = this.state.isLoading_l,
-        isMoodSet_l = this.state.isMoodSet_l,
-        isLoading_r = this.state.isLoading_r,
-        isMoodSet_r = this.state.isMoodSet_r;
+    let isLoadingLeft = this.state.isLoadingLeft,
+        isMoodSetLeft = this.state.isMoodSetLeft,
+        isLoadingRight = this.state.isLoadingRight,
+        isMoodSetRight = this.state.isMoodSetRight;
 
-    var buttonClasses_l = classSet({
+    var buttonClassesLeft = classSet({
       "mood-button-left": true,
-      "loading": isLoading_l,
-      "success": isMoodSet_l
+      "loading": isLoadingLeft,
+      "success": isMoodSetLeft
     });
 
-    var buttonClasses_r = classSet({
+    var buttonClassesRight = classSet({
       "mood-button-right": true,
-      "loading": isLoading_r,
-      "success": isMoodSet_r
+      "loading": isLoadingRight,
+      "success": isMoodSetRight
     });
 
     return <div className="mood moodmeter-content">
-      <button className={buttonClasses_l}
-            disabled={isLoading_l || isMoodSet_l || isLoading_r || isMoodSet_r}
-            onClick={!isLoading_l ? this.setStatus_l : null}>
-        {isLoading_l ? <Icon spin name="circle-o-notch" />
-                   : isMoodSet_l ? <Icon name="check-circle" />
+      <button className={buttonClassesLeft}
+            disabled={isLoadingLeft || isMoodSetLeft || isLoadingRight || isMoodSetRight}
+            onClick={!isLoadingLeft ? this.setStatusLeft("stressed") : null}>
+        {isLoadingLeft ? <Icon spin name="circle-o-notch" />
+                   : isMoodSetLeft ? <Icon name="check-circle" />
                                : <Icon name="meh-o" />}
       </button>
-      <button className={buttonClasses_r}
-             disabled={isLoading_r || isMoodSet_r || isLoading_l || isMoodSet_l}
-             onClick={!isLoading_r ? this.setStatus_r : null}>
-        {isLoading_r ? <Icon spin name="circle-o-notch" />
-                   : isMoodSet_r ? <Icon name="check-circle" />
+      <button className={buttonClassesRight}
+             disabled={isLoadingRight || isMoodSetRight || isLoadingLeft || isMoodSetLeft}
+             onClick={!isLoadingRight ? this.setStatusRight("happy") : null}>
+        {isLoadingRight ? <Icon spin name="circle-o-notch" />
+                   : isMoodSetRight ? <Icon name="check-circle" />
                                : <Icon name="smile-o" />}
       </button>
     </div>
   },
 
-  setStatus_l() {
+  setStatus(msg) {
     // Replace button state
-    this.setState({isLoading_l: true});
-
-    let moodMessage = { message: "stressed" };
-
-    fetch(window.STATUSES, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(moodMessage)
-    }).then((res) => {
-      setTimeout(() => {
-
-        // Completed of async action, set loading state back
-        this.setState({
-          isLoading_l: false,
-          isMoodSet_l: true
-        });
-      }, 2000);
+    this.setState({
+        isLoadingLeft: true,
+        isLoadingRight: true
     });
-  },
 
-  setStatus_r() {
-    // Replace button state
-    this.setState({isLoading_r: true});
-
-    let moodMessage = { message: "happy" };
+    let moodMessage = { message: msg };
 
     fetch(window.STATUSES, {
       method: "POST",
@@ -94,12 +73,15 @@ let Mood = React.createClass({
 
         // Completed of async action, set loading state back
         this.setState({
-          isLoading_r: false,
-          isMoodSet_r: true
+          isLoadingLeft: false,
+          isLoadingRight: false,
+          isMoodSetLeft: true,
+          isMoodSetRight: true,
         });
       }, 2000);
     });
   }
+  
 });
 
 export default Mood;

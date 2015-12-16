@@ -48,8 +48,7 @@ let Stats = React.createClass({
       });
 
       this.setState({
-        stressed_data: barData,
-        maxValue_stressed: _.max(json)
+        stressed_data: barData
       });
     });
 
@@ -67,8 +66,7 @@ let Stats = React.createClass({
       });
 
       this.setState({
-        happy_data: barData,
-        maxValue_happy: _.max(json)
+        happy_data: barData
       });
     });
   },
@@ -80,18 +78,19 @@ let Stats = React.createClass({
   },
 
   renderBarColumn() {
-    let sum_list = _.map(this.state.stressed_data, (data, index) => { return data.value + this.state.happy_data[index].value; });
+    let sumList = _.map(this.state.stressed_data, (data, index) => { return data.value + this.state.happy_data[index].value; });
+    let maxSum = _.max(sumList);
     return _.map(this.state.stressed_data, (data, index) => {
-      let max_sum = _.max(sum_list);
-      let p_value = Math.round((data.value + this.state.happy_data[index].value) / max_sum * 100);
-      let barHeight = p_value + "%";
-      let height_final = p_value < 10 ? "10%" : barHeight
+      let happyValue = this.state.happy_data[index].value;
+      let pValue = Math.round((data.value + happyValue) / maxSum * 100);
+      let barHeight = pValue + "%";
+      let heightFinal = pValue < 10 ? "10%" : barHeight
       let style = {
-        height: data.value === 0 && this.state.happy_data[index].value === 0 ? "100%" : height_final
+        height: data.value === 0 && happyValue === 0 ? "100%" : heightFinal
       };
       let barClasses = classSet({
         "bar": true,
-        "bar-with-no-value": data.value === 0 && this.state.happy_data[index].value === 0
+        "bar-with-no-value": data.value === 0 && happyValue === 0
       });
 
       return <div key={index}
@@ -100,7 +99,7 @@ let Stats = React.createClass({
           <div className="value" style={style}>
             <ul>
               <li>{<Icon name="meh-o" />} {data.value}</li>
-              <li>{<Icon name="smile-o" />} {this.state.happy_data[index].value}</li>
+              <li>{<Icon name="smile-o" />} {happyValue}</li>
             </ul>
           </div>
         </div>
