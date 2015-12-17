@@ -8,6 +8,7 @@ let { Route, RouteHandler, NotFoundRoute, DefaultRoute, Link } = Router;
 import Mood from "./components/mood";
 import Stats from "./components/stats";
 import Navigation from "./components/navigation";
+import SetMood from "./components/setmood";
 
 // API URL's constants
 
@@ -34,6 +35,7 @@ let routes = (
   <Route handler={StressedApp} path="/">
     <Route handler={Mood} name="mood" path="/mood" />
     <Route handler={Stats} name="stats" path="/stats" />
+    <Route handler={SetMood} name="setmood" path="/setmood" />
     <NotFoundRoute handler={Mood}/>
     <DefaultRoute handler={Mood} pageTitle="Home"/>
   </Route>

@@ -1,6 +1,7 @@
 "use strict";
 
 import React from "react/addons";
+import _ from "lodash";
 import fetch from "node-fetch";
 import Icon from "react-fa";
 import classSet from "classnames";
@@ -10,100 +11,83 @@ let Mood = React.createClass({
 
   getInitialState() {
     return {
-      isLoadingLeft: false,
-      isMoodSetLeft: false,
-      isLoadingRight: false,
-      isMoodSetRight: false
+      stressed_data: [],
+      happy_data: []
     };
   },
 
-  render() {
-    let isLoadingLeft = this.state.isLoadingLeft,
-        isMoodSetLeft = this.state.isMoodSetLeft,
-        isLoadingRight = this.state.isLoadingRight,
-        isMoodSetRight = this.state.isMoodSetRight;
+  componentWillMount() {
+    /*
+      Endpoint response for timeseries
+      {
+        1428537600: 12,
+        1428624000: 0,
+        1428710400: 32
+      }
+    */
+    const currentTime = Math.round(new Date().getTime() / 1000);
+    const tenDays = 9 * 24 * 60 * 60;
+    const tenDaysSinceNow = currentTime - tenDays;
 
-    var buttonClassesLeft = classSet({
-      "mood-button-left": true,
-      "loading": isLoadingLeft,
-      "success": isMoodSetLeft
+    fetch(window.TIMESERIES + "?since=" + tenDaysSinceNow + "&message=stressed")
+    .then((res) => {
+        return res.json();
+    }).then((json) => {
+        let barData = [];
+
+      Object.keys(json).map((k) => {
+        barData.push({
+          timeframe: parseInt(k),
+          value: json[k]
+        });
+      });
+
+      this.setState({
+        stressed_data: barData
+      });
     });
 
-    var buttonClassesRight = classSet({
-      "mood-button-right": true,
-      "loading": isLoadingRight,
-      "success": isMoodSetRight
-    });
+    fetch(window.TIMESERIES + "?since=" + tenDaysSinceNow + "&message=happy")
+    .then((res) => {
+        return res.json();
+    }).then((json) => {
+      let barData = [];
 
-    return <div className="mood moodmeter-content">
-      <button className={buttonClassesLeft}
-            disabled={isLoadingLeft || isMoodSetLeft || isLoadingRight || isMoodSetRight}
-            onClick={!isLoadingLeft ? this.setStatusLeft : null}>
-        {isLoadingLeft ? <Icon spin name="circle-o-notch" />
-                   : isMoodSetLeft ? <Icon name="check-circle" />
-                               : <Icon name="meh-o" />}
-      </button>
-      <button className={buttonClassesRight}
-             disabled={isLoadingRight || isMoodSetRight || isLoadingLeft || isMoodSetLeft}
-             onClick={!isLoadingRight ? this.setStatusRight : null}>
-        {isLoadingRight ? <Icon spin name="circle-o-notch" />
-                   : isMoodSetRight ? <Icon name="check-circle" />
-                               : <Icon name="smile-o" />}
-      </button>
-    </div>
+      Object.keys(json).map((k) => {
+        barData.push({
+          timeframe: parseInt(k),
+          value: json[k]
+        });
+      });
+
+      this.setState({
+        happy_data: barData
+      });
+    });
   },
 
-  setStatusLeft() {
-    // Replace button state
-    this.setState({
-        isLoadingLeft: true
+  render() {
+    let sumListTotal = _.map(this.state.stressed_data, (data, index) => { return data.value + this.state.happy_data[index].value; });
+    let sumHappyList = _.map(this.state.happy_data, (data, index) => { return data.value; });
+    let sumTotal = _.sum(sumListTotal);
+    let sumHappy = _.sum(sumHappyList);
+
+    let pGreen = Math.round((sumHappy) / sumTotal * 100);
+    let percentage = sumTotal === 0 ? "0%" : pGreen + "%";
+    let bg = sumHappy === 0 && sumTotal === 0 ? "green" : "-webkit-radial-gradient(left center, circle farthest-corner, green " + percentage + ", red)";
+
+    var gradientClass = classSet({
+      "gradient-bg": true,
     });
 
-    let moodMessage = { message: "stressed" };
+    let style = {
+      background: bg
+    }
 
-    fetch(window.STATUSES, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(moodMessage)
-    }).then((res) => {
-      setTimeout(() => {
-
-        // Completed of async action, set loading state back
-        this.setState({
-          isLoadingLeft: false,
-          isMoodSetLeft: true
-        });
-      }, 2000);
-    });
-},
-
-setStatusRight() {
-  // Replace button state
-  this.setState({
-      isLoadingRight: true
-  });
-
-  let moodMessage = { message: "happy" };
-
-  fetch(window.STATUSES, {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(moodMessage)
-  }).then((res) => {
-    setTimeout(() => {
-
-      // Completed of async action, set loading state back
-      this.setState({
-        isLoadingRight: false,
-        isMoodSetRight: true
-      });
-    }, 2000);
-  });
-}
+    return <div className="mood moodmeter-content">
+      <div className={gradientClass} style={style} > </div>
+    </div>
+  }
 
 });
 

@@ -14,6 +14,11 @@ let Navigation = React.createClass({
               className="mood-button"><Icon name="home" /></Link>
       </li>
       <li>
+        <Link to="setmood"
+              bsStyle="link"
+              className="setmood-button"><Icon name="meh-o" /></Link>
+      </li>
+      <li>
         <Link to="stats"
               bsStyle="link"
               className="stats-button"><Icon name="line-chart" /></Link>
@@ -23,4 +28,3 @@ let Navigation = React.createClass({
 });
 
 export default Navigation;
-
