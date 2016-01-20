@@ -19,8 +19,8 @@ Data is stored in an sqlite db. It looks like this:
 You can simply fire it up using:
 
 ```bash
-docker build -t mood .
-docker run -p 5000:80 -it mood
+docker build -t mood-meter --no-cache .
+docker run -p 8080:80 -it mood-meter
 ```
 
 The server will be available on `127.0.0.1:5000`.
