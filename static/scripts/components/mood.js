@@ -74,7 +74,7 @@ let Mood = React.createClass({
 
     let pGreen = Math.round((sumHappy) / sumTotal * 100);
     let percentage = sumTotal === 0 ? "0%" : pGreen + "%";
-    let bg = sumHappy === 0 && sumTotal === 0 ? "green" : "-webkit-radial-gradient(left center, circle farthest-corner, green " + percentage + ", red)";
+    let bg = sumHappy === 0 && sumTotal === 0 ? "green" : "linear-gradient(90deg, green " + percentage + ", red " + percentage + ")";
 
     var gradientClass = classSet({
       "gradient-bg": true,
